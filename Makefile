@@ -1,5 +1,5 @@
 
-.PHONY: all requirements help
+.PHONY: all help
 
 all: help
 
@@ -8,40 +8,22 @@ help:
 	@echo "----"
 	@echo
 	@echo "  requirements - (re)generate pinned and minimum requirements"
+	@echo "  clean - remove generated and temporary files"
 
-# Perform forced build using -W for the (.PHONY) requirements target
+
+.PHONY: requirements requirements.txt requirements/*
+
 requirements:
-	$(MAKE) -W $(REQFILE) min-required.txt requirements.txt
+	$(MAKE) -C requirements
 
-REQS=.reqs
-REQFILE=requirements/recommended.txt
+requirements.txt requirements/*:
+	$(MAKE) -C requirements $@
 
-requirements.txt: $(REQFILE) requirements/required.txt # by inclusion
-	@set -e;							\
-	 case `pip --version` in					\
-	   "pip 0"*|"pip 1.[012]"*)					\
-	     virtualenv --no-site-packages --clear $(REQS);		\
-	     source $(REQS)/bin/activate;				\
-	     echo starting clean install of requirements from PyPI;	\
-	     pip install --use-mirrors -r $(REQFILE);			\
-	     : trap removes partial/empty target on failure;		\
-	     trap 'if [ "$$?" != 0 ]; then rm -f $@; fi' 0;		\
-	     pip freeze | grep -v '^wsgiref==' | sort > $@ ;;		\
-	   *)								\
-	     : only pip 1.3.1+ processes --download recursively;	\
-	     rm -rf $(REQS); mkdir $(REQS);				\
-	     echo starting download of requirements from PyPI;		\
-	     pip install --download $(REQS) -r $(REQFILE);		\
-	     : trap removes partial/empty target on failure;		\
-	     trap 'if [ "$$?" != 0 ]; then rm -f $@; fi' 0;		\
-	     (cd $(REQS) && ls *.tar* |					\
-	      sed -e 's/-\([0-9]\)/==\1/' -e 's/\.tar.*$$//') > $@;	\
-	 esac; 
 
-min-required.txt: requirements/*.txt
-	@if grep -q '>[0-9]' $^; then				\
-	   echo "Use '>=' not '>' for requirements"; exit 1;	\
+.PHONY: clean
+
+clean:
+	@if git clean -ndX | grep .; then                               \
+	   printf 'Remove these files? (y/N) '; read ANS;               \
+	   case $$ANS in [yY]*) git clean -fdX;; *) exit 1;; esac       \
 	 fi
-	@echo "creating $@"
-	@# uses `ls -r` to alphabetically reverse req files for better ordering
-	@cat `ls -r $^` | sed -n '/=/{s/>=/==/;s/<.*//;p;}' > $@

@@ -1,0 +1,10 @@
+# Generated symlink (for testing)
+freeze.py
+
+# Generated documentation
+README.html
+README.man
+
+# Requirements generation
+.reqs
+src
