@@ -1,6 +1,6 @@
 -r recommended.txt
 
-Flask-WTF>=0.5.2
+Flask-WTF>=0.8
 
 # Note: psyco is dead; final release 1.6 does not support 64-bit or Python 2.7
 # You may still get a speedup on 32-bit architecture with Python 2.6
