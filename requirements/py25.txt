@@ -1,2 +1,4 @@
 Flask<0.10
 Jinja2<2.7
+Werkzeug<0.9
+WTForms<1.0.2
