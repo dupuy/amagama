@@ -20,7 +20,12 @@
 
 """JSON based public APIs for the translation memory server"""
 
-from flask import Blueprint, request, current_app, render_template
+from flask import Blueprint, request, current_app, render_template, __version__
+
+if __version__ < '0.8':
+    from amagama import flaskext_compat
+    flaskext_compat.activate()
+
 from flask.ext.wtf import Form, TextField, Required
 
 module = Blueprint('webui', __name__)

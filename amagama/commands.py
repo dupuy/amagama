@@ -24,7 +24,11 @@ import os
 from translate.storage import factory
 from translate.lang.data import langcode_ire
 
-from flask import current_app
+from flask import current_app, __version__
+
+if __version__ < '0.8':
+    from amagama import flaskext_compat
+    flaskext_compat.activate()
 
 from flask.ext.script import Command, Option, prompt_bool
 
